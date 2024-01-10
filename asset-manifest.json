@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/camera-thing/static/css/main.5a60c4c1.css",
+    "main.js": "/camera-thing/static/js/main.c9f3dcbb.js",
+    "static/js/787.bacecfca.chunk.js": "/camera-thing/static/js/787.bacecfca.chunk.js",
+    "index.html": "/camera-thing/index.html",
+    "main.5a60c4c1.css.map": "/camera-thing/static/css/main.5a60c4c1.css.map",
+    "main.c9f3dcbb.js.map": "/camera-thing/static/js/main.c9f3dcbb.js.map",
+    "787.bacecfca.chunk.js.map": "/camera-thing/static/js/787.bacecfca.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5a60c4c1.css",
+    "static/js/main.c9f3dcbb.js"
+  ]
+}
