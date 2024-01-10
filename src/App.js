@@ -1,7 +1,7 @@
 // App.js
 import React, { useState, useRef } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getStorage, ref, uploadString } from 'firebase/storage';
+import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import Webcam from 'react-webcam';
 
 const firebaseConfig = {
@@ -30,11 +30,9 @@ const App = () => {
     
     try {
       const storageRef = ref(storage, `/files/${Date.now()}.jpeg`);
-      await uploadString(storageRef, imgSrc, 'data_url');
+      const snapshot = await uploadString(storageRef, imgSrc, 'data_url');
 
-      storageRef.getDownloadURL().then(downloadURL => {
-        console.log('File available at', downloadURL);
-      });
+      getDownloadURL(snapshot.ref).then( url => console.log(url));
     } catch (error) {
       console.error('Error uploading image to Firebase:', error);
     }
