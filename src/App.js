@@ -51,7 +51,7 @@ const App = () => {
   const handleCopyURL = () => {
     if (downloadURL) {
       navigator.clipboard.writeText(downloadURL);
-      alert('Download URL copied to clipboard!');
+      //alert('Download URL copied to clipboard!');
     }
   };
 
@@ -154,3 +154,4 @@ export default App;
 // };
 
 // export default App;
+
