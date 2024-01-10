@@ -39,7 +39,7 @@ const App = () => {
 
     try {
       const storageRef = ref(storage, `/files/${Date.now()}.jpeg`);
-      await uploadString(storageRef, imgSrc, 'data_url');
+      const snapshot = await uploadString(storageRef, imgSrc, 'data_url');
 
       const url = await getDownloadURL(storageRef);
       setDownloadURL(url);
