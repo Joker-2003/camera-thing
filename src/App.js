@@ -1,7 +1,7 @@
 // App.js
 import React, { useState, useRef } from 'react';
 import { initializeApp } from 'firebase/app';
-import {ref} from 'firebase/storage';
+import { getStorage, ref, uploadString } from 'firebase/storage';
 import Webcam from 'react-webcam'
 
 const firebaseConfig = {
@@ -14,6 +14,7 @@ const firebaseConfig = {
   measurementId: "G-00TF5Y5KG8"
 };
 const app = initializeApp(firebaseConfig);
+const storage = getStorage(app)
 
 const App = () => {
   const [image, setImage] = useState(null);
@@ -52,15 +53,18 @@ const App = () => {
   const handleUpload = async () => {
     if (!imgSrc) return;
     try {
-      const storageRef = app.storage().ref();
-      storageRef.putString(imgSrc, 'data_url').then(function(snapshot) {
+      const storageRef = ref(storage,`/files/${imgSrc}`)
+      await uploadString(storageRef, imgSrc, 'data_url').then((snapshot) => {
         console.log('Uploaded a data_url string!');
+        snapshot.ref.getDownloadURL().then(function(downloadURL) {
+          console.log("File available at", downloadURL);
+        });
       });
-      const imageRef = storageRef.child(`images/${Date.now()}.png`);
-      await imageRef.putString(image.replace('data:image/png;base64,', ''), 'data_url');
+      // const imageRef = storageRef.child(`images/${Date.now()}.png`);
+      // await imageRef.putString(image.replace('data:image/png;base64,', ''), 'data_url');
 
-      const downloadURL = await imageRef.getDownloadURL();
-      console.log('Firebase download link:', downloadURL);
+      // const downloadURL = await imageRef.getDownloadURL();
+      // console.log('Firebase download link:', downloadURL);
     } catch (error) {
       console.error('Error uploading image to Firebase:', error);
     }
