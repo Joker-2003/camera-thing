@@ -1,7 +1,8 @@
 // App.js
 import React, { useState, useRef } from 'react';
 import { initializeApp } from 'firebase/app';
-import 'firebase/storage';
+import {ref} from 'firebase/storage';
+import Webcam from 'react-webcam'
 
 const firebaseConfig = {
   apiKey: "AIzaSyD8VxVPnBJTkX0F7GYZOViZ2RYCHtj_Of8",
@@ -49,8 +50,12 @@ const App = () => {
   };
 
   const handleUpload = async () => {
+    if (!imgSrc) return;
     try {
       const storageRef = app.storage().ref();
+      storageRef.putString(imgSrc, 'data_url').then(function(snapshot) {
+        console.log('Uploaded a data_url string!');
+      });
       const imageRef = storageRef.child(`images/${Date.now()}.png`);
       await imageRef.putString(image.replace('data:image/png;base64,', ''), 'data_url');
 
@@ -61,25 +66,34 @@ const App = () => {
     }
   };
 
+  const webcamRef = React.useRef(null);
+  const capture = React.useCallback(
+    () => {
+      const imageSrc = webcamRef.current.getScreenshot();
+      setImgSrc(imageSrc)
+      console.log(imageSrc)
+    },
+    [webcamRef]
+  );
+  const videoConstraints = {
+    width: 1280,
+    height: 720,
+    facingMode: "user"
+  };
+  const [imgSrc, setImgSrc] = useState(null)
   return (
-    <div>
-      <h1>React Camera App</h1>
-      <div>
-        {streamPaused ? (
-          <img src={image} alt="Captured" width="400" height="300" />
-        ) : (
-          <video ref={videoRef} width="400" height="300" />
-        )}
-      </div>
-      {image && (
-        <div>
-          <button onClick={handleUpload}>Upload to Firebase Storage</button>
-        </div>
-      )}
-      <div>
-        <button onClick={handleCapture}>Capture Photo</button>
-      </div>
-    </div>
+    <>
+      <Webcam
+        audio={false}
+        height={300}
+        ref={webcamRef}
+        screenshotFormat="image/jpeg"
+        width={500}
+        videoConstraints={videoConstraints}
+      />
+      <button onClick={capture}>Capture photo</button>
+      <button onClick={handleUpload}>Upload to Firebase Storage</button>
+    </>
   );
 };
 
