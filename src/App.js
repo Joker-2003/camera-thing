@@ -1,22 +1,8 @@
 // App.js
 import React, { useState, useRef } from 'react';
-import { initializeApp } from 'firebase/app';
-import 'firebase/storage';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyD8VxVPnBJTkX0F7GYZOViZ2RYCHtj_Of8",
-  authDomain: "ieee-camera.firebaseapp.com",
-  projectId: "ieee-camera",
-  storageBucket: "ieee-camera.appspot.com",
-  messagingSenderId: "422076680956",
-  appId: "1:422076680956:web:9c2b1fbfb4e8137a97e579",
-  measurementId: "G-00TF5Y5KG8"
-};
-const app = initializeApp(firebaseConfig);
 
 const App = () => {
   const [image, setImage] = useState(null);
-  const [streamPaused, setStreamPaused] = useState(false);
   const videoRef = useRef(null);
 
   const handleCapture = async () => {
@@ -30,52 +16,54 @@ const App = () => {
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
 
-      videoRef.current.addEventListener('loadedmetadata', () => {
-        context.drawImage(
-          videoRef.current,
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-        const imageDataURL = canvas.toDataURL('image/png');
-        setImage(imageDataURL);
-        setStreamPaused(true);
-        stream.getTracks().forEach(track => track.stop()); // Stop the live stream
+      videoRef.current.addEventListener('loadeddata', () => {
+        requestAnimationFrame(() => {
+          context.drawImage(
+            videoRef.current,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+          console.log('Captured Image:', canvas.toDataURL('image/png'));
+          const imageDataURL = canvas.toDataURL('image/png');
+          setImage(imageDataURL);
+        });
       });
     } catch (error) {
       console.error('Error accessing camera:', error);
     }
   };
 
-  const handleUpload = async () => {
-    try {
-      const storageRef = app.storage().ref();
-      const imageRef = storageRef.child(`images/${Date.now()}.png`);
-      await imageRef.putString(image.replace('data:image/png;base64,', ''), 'data_url');
+  const handleDismiss = () => {
+    setImage(null);
+  };
 
-      const downloadURL = await imageRef.getDownloadURL();
-      console.log('Firebase download link:', downloadURL);
-    } catch (error) {
-      console.error('Error uploading image to Firebase:', error);
-    }
+  const handleUpload = () => {
+    console.log('Uploading...');
+    // Add your upload logic here (e.g., send image to server)
   };
 
   return (
     <div>
       <h1>React Camera App</h1>
-      <div>
-        {streamPaused ? (
-          <img src={image} alt="Captured" width="400" height="300" />
-        ) : (
-          <video ref={videoRef} width="400" height="300" />
-        )}
-      </div>
-      {image && (
+      <div style={{ display: 'flex' }}>
         <div>
-          <button onClick={handleUpload}>Upload to Firebase Storage</button>
+          <video ref={videoRef} width="400" height="300" autoPlay playsInline />
         </div>
-      )}
+        <div>
+          {image && (
+            <>
+              <img src={image} alt="Captured" width="400" height="300" />
+              <div>
+                <button onClick={handleDismiss}>Dismiss</button>
+                <button onClick={handleUpload}>Upload</button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
       <div>
         <button onClick={handleCapture}>Capture Photo</button>
       </div>
@@ -84,90 +72,3 @@ const App = () => {
 };
 
 export default App;
-
-// import React, { useState, useRef } from 'react';
-// import { initializeApp } from 'firebase/app';
-// import 'firebase/storage';
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyD8VxVPnBJTkX0F7GYZOViZ2RYCHtj_Of8",
-//   authDomain: "ieee-camera.firebaseapp.com",
-//   projectId: "ieee-camera",
-//   storageBucket: "ieee-camera.appspot.com",
-//   messagingSenderId: "422076680956",
-//   appId: "1:422076680956:web:9c2b1fbfb4e8137a97e579",
-//   measurementId: "G-00TF5Y5KG8"
-// };
-// const app = initializeApp(firebaseConfig);
-
-// const App = () => {
-//   const [image, setImage] = useState(null);
-//   const [streamPaused, setStreamPaused] = useState(false);
-//   const videoRef = useRef(null);
-
-//   const handleCapture = async () => {
-//     try {
-//       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-//       videoRef.current.srcObject = stream;
-//       videoRef.current.play();
-
-//       const canvas = document.createElement('canvas');
-//       const context = canvas.getContext('2d');
-//       canvas.width = videoRef.current.videoWidth;
-//       canvas.height = videoRef.current.videoHeight;
-
-//       videoRef.current.addEventListener('loadedmetadata', () => {
-//         context.drawImage(
-//           videoRef.current,
-//           0,
-//           0,
-//           canvas.width,
-//           canvas.height
-//         );
-//         const imageDataURL = canvas.toDataURL('image/png');
-//         setImage(imageDataURL);
-//         setStreamPaused(true);
-//         stream.getTracks().forEach(track => track.stop()); // Stop the live stream
-//       });
-//     } catch (error) {
-//       console.error('Error accessing camera:', error);
-//     }
-//   };
-
-//   const handleUpload = async () => {
-//     try {
-//       const storageRef = app.storage().ref();
-//       const imageRef = storageRef.child(`images/${Date.now()}.png`);
-//       await imageRef.putString(image.replace('data:image/png;base64,', ''), 'data_url');
-
-//       const downloadURL = await imageRef.getDownloadURL();
-//       console.log('Firebase download link:', downloadURL);
-//     } catch (error) {
-//       console.error('Error uploading image to Firebase:', error);
-//     }
-//   };
-
-//   return (
-//     <div>
-//       <h1>React Camera App</h1>
-//       <div>
-//         <video ref={videoRef} width="400" height="300" />
-//       </div>
-//       {image && (
-//         <>
-//           <div>
-//             <img src={image} alt="Captured" width="200" height="150" />
-//           </div>
-//           <div>
-//             <button onClick={handleUpload}>Upload to Firebase Storage</button>
-//           </div>
-//         </>
-//       )}
-//       <div>
-//         <button onClick={handleCapture}>Capture Photo</button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default App;
