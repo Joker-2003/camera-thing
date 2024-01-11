@@ -1,8 +1,9 @@
-// App.js
 import React, { useState, useRef } from 'react';
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import Webcam from 'react-webcam';
+import bcrypt from 'bcryptjs'; // Import bcryptjs for password hashing
+import Logo from './logo.png';
 import './App.css';
 
 const firebaseConfig = {
@@ -18,15 +19,19 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
+
 const App = () => {
+  const hashedPassword = '$2a$10$YQ1sSmnoYi1dS8yWON50VucmCYfp9P4oWCpAfEviuDxsgI0S6bGWy'; 
+
+
+  const [showMainPage, setShowMainPage] = useState(false);
   const [imgSrc, setImgSrc] = useState(null);
   const [downloadURL, setDownloadURL] = useState(null);
-
   const webcamRef = useRef(null);
   const videoConstraints = {
     width: 1280,
     height: 720,
-    facingMode: "environment"
+    facingMode: 'environment',
   };
 
   const handleCapture = async () => {
@@ -55,30 +60,68 @@ const App = () => {
     }
   };
 
-  return (
-    <div className="app-container">
-     
-        <Webcam
-          audio={false}
-          height={300}
-          ref={webcamRef}
-          screenshotFormat="image/jpeg"
-          width={500}
-          videoConstraints={videoConstraints}
+  const AccessWall = () => {
+    const [password, setPassword] = useState('');
+    const checkPassword = () => {
+      const isPasswordCorrect = bcrypt.compareSync(password, hashedPassword);
+      if (isPasswordCorrect) {
+        setShowMainPage(true);
+      } else {
+        alert('Incorrect password. Please try again.');
+      }
+    };
+
+    return (
+      <div className="access-wall">
+        <h2>IEEE Tech Team </h2>
+        <input
+          type="password"
+          placeholder="Enter password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyPress={(e) => { if (e.key === 'Enter') checkPassword(); } }
         />
-        <button onClick={handleCapture}>Capture photo</button>
+        <button onClick={checkPassword}>Enter</button>
+      </div>
+    );
+  };
 
-      
-      {imgSrc && (
-        <div className="preview-container">
-          <img src={imgSrc} alt="Captured" className="preview-image" />
-          <button onClick={handleUpload}>Upload to Firebase Storage</button>
+  return (
+    <div>
+      {!showMainPage ? (
+        <AccessWall />
+      ) : (
+        <div className="app-container">
+          <header className="app-header">
+            <img src={Logo} alt="IEEE Tech Team Logo" className="app-logo" />
+            <h1>IEEE Tech Team</h1>
+          </header>
 
-          {downloadURL && (
-            <div>
-              <p>Download URL:</p>
-              <input type="text" value={downloadURL} readOnly />
-              <button onClick={handleCopyURL}>Copy URL</button>
+          <Webcam
+            audio={false}
+            height={300}
+            ref={webcamRef}
+            screenshotFormat="image/jpeg"
+            width={500}
+            videoConstraints={videoConstraints}
+          />
+          <button onClick={handleCapture}>Capture photo</button>
+
+          {imgSrc && (
+            <div className="preview-container">
+              <img src={imgSrc} alt="Captured" className="preview-image" />
+              <button onClick={handleUpload}>Upload to Firebase Storage</button>
+              <button onClick={() => setImgSrc(null)} className="red-warning">
+                Retake
+              </button>
+
+              {downloadURL && (
+                <div>
+                  <p>Download URL:</p>
+                  <input type="text" value={downloadURL} readOnly />
+                  <button onClick={handleCopyURL}>Copy URL</button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -88,70 +131,3 @@ const App = () => {
 };
 
 export default App;
-
-// // App.js
-// import React, { useState, useRef } from 'react';
-// import { initializeApp } from 'firebase/app';
-// import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
-// import Webcam from 'react-webcam';
-// import './App.css'; // Import the CSS file
-
-
-// const app = initializeApp(firebaseConfig);
-// const storage = getStorage(app);
-
-// const App = () => {
-//   const [imgSrc, setImgSrc] = useState(null);
-
-//   const webcamRef = useRef(null);
-//   const videoConstraints = {
-//     width: 1280,
-//     height: 720,
-//     facingMode: "user"
-//   };
-
-//   const handleCapture = async () => {
-//     const captureSrc = webcamRef.current.getScreenshot();
-//     setImgSrc(captureSrc);
-//   };
-
-//   const handleUpload = async () => {
-//     if (!imgSrc) return;
-
-//     try {
-//       const storageRef = ref(storage, `/files/${Date.now()}.jpeg`);
-//       await uploadString(storageRef, imgSrc, 'data_url');
-
-//       const downloadURL = await getDownloadURL(storageRef);
-//       console.log('File available at', downloadURL);
-//     } catch (error) {
-//       console.error('Error uploading image to Firebase:', error);
-//     }
-//   };
-
-//   return (
-//     <div className="app-container">
-//       <div className="camera-container">
-//         <Webcam
-//           audio={false}
-//           height={300}
-//           ref={webcamRef}
-//           screenshotFormat="image/jpeg"
-//           width={500}
-//           videoConstraints={videoConstraints}
-//         />
-//         <button onClick={handleCapture}>Capture photo</button>
-//       </div>
-      
-//       {imgSrc && (
-//         <div className="preview-container">
-//           <img src={imgSrc} alt="Captured" className="preview-image" />
-//           <button onClick={handleUpload}>Upload to Firebase Storage</button>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default App;
-
