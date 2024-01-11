@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/camera-thing/static/css/main.efd4c3ed.css",
-    "main.js": "/camera-thing/static/js/main.dedad55c.js",
-    "static/js/787.bacecfca.chunk.js": "/camera-thing/static/js/787.bacecfca.chunk.js",
+    "main.js": "/camera-thing/static/js/main.a3990f2b.js",
+    "static/js/787.9066e80d.chunk.js": "/camera-thing/static/js/787.9066e80d.chunk.js",
     "static/media/logo.png": "/camera-thing/static/media/logo.99665c49b7bfed880592.png",
     "index.html": "/camera-thing/index.html",
     "main.efd4c3ed.css.map": "/camera-thing/static/css/main.efd4c3ed.css.map",
-    "main.dedad55c.js.map": "/camera-thing/static/js/main.dedad55c.js.map",
-    "787.bacecfca.chunk.js.map": "/camera-thing/static/js/787.bacecfca.chunk.js.map"
+    "main.a3990f2b.js.map": "/camera-thing/static/js/main.a3990f2b.js.map",
+    "787.9066e80d.chunk.js.map": "/camera-thing/static/js/787.9066e80d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.efd4c3ed.css",
-    "static/js/main.dedad55c.js"
+    "static/js/main.a3990f2b.js"
   ]
 }
